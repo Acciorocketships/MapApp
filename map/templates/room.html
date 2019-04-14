@@ -1,0 +1,55 @@
+<html>
+<body>
+	
+<!-- {% for loc in locs %}
+	<li>{{ loc.lat }}, {{ loc.lng }}</li>
+{% endfor %} -->
+
+<div id="list">
+
+</div>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+var updateLocation = function(loc){
+	var lat = loc.coords.latitude;
+	var lng = loc.coords.longitude;
+
+	var url = "/map/room/location/{{ room }}/" + lat + "/" + lng + "?time=" + (new Date).getTime();
+
+	$.get(url, function(data, status){ console.log(data); });
+};
+
+var getLocation = function(){
+	if (navigator.geolocation) {
+	    navigator.geolocation.getCurrentPosition(updateLocation);
+	  } else { 
+	    alert("Geolocation is not supported by this browser");
+	}
+}
+
+var populateList = function(){
+	var url = "/map/room/location/{{ room }}" + "?time=" + (new Date).getTime();
+	$.get(url, function(data, status){
+		var jsondata = JSON.parse(data);
+		var lochtml = "";
+		console.log(jsondata);
+		console.log(data);
+		for (var i = 0; i < jsondata.length; i++){
+			var loc = jsondata[i];
+			lochtml += "<li>" + loc.lat + ", " + loc.lng + "</li>";
+		}
+		$("#list").html(lochtml);
+	});
+};
+
+$(document).ready(function(){
+	populateList();
+	window.setInterval(getLocation, 1000);
+	window.setInterval(populateList, 1000);
+});
+
+</script>
+</html>
