@@ -13,7 +13,6 @@ class Create(View):
 		uid = str(uuid.uuid1())
 		room = RoomModel(uid=uid)
 		room.save()
-		import pdb; pdb.set_trace()
 		return HttpResponseRedirect('/map/room/' + uid)
 
 
@@ -35,6 +34,8 @@ class UpdateLocation(View):
 
 		room = RoomModel.objects.filter(id=room_id)[0]
 		loc = Location.objects.filter(room=room)
+		# print(loc.values())
+
 		if (len(loc) <= 0):
 			loc = Location(lat=lat, lng=lng, user=user, room=room)
 		else:
@@ -49,8 +50,12 @@ class UpdateLocation(View):
 class GetLocations(View):
 
 	def get(self,request,*args,**kwargs):
-		user = request.session.get("user", str(uuid.uuid1()))
-		request.session["user"] = user
+		if "user" not in request.session:
+			user = str(uuid.uuid1())
+			request.session["user"] = user
+			room = RoomModel.objects.filter(id=kwargs["room"])[0]
+			loc = Location(lat=kwargs["lat"], lng=kwargs["lng"], user=user, room=room)
+			loc.save()
 		rid = kwargs["room"]
 		locs = Location.objects.filter(room=rid)
 		data = json.dumps([{'lat':loc.lat,'lng':loc.lng} for loc in locs])

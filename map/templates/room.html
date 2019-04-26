@@ -31,12 +31,14 @@ var getLocation = function(){
 }
 
 var populateList = function(){
-	var url = "/map/room/location/{{ room }}" + "?time=" + (new Date).getTime();
+	var lat = loc.coords.latitude;
+	var lng = loc.coords.longitude;
+	var url = "/map/room/location/{{ room }}/" + lat + "/" + lng + "?time=" + (new Date).getTime();
 	$.get(url, function(data, status){
 		var jsondata = JSON.parse(data);
 		var lochtml = "";
-		console.log(jsondata);
-		console.log(data);
+		// console.log(jsondata);
+		// console.log(data);
 		for (var i = 0; i < jsondata.length; i++){
 			var loc = jsondata[i];
 			lochtml += "<li>" + loc.lat + ", " + loc.lng + "</li>";
